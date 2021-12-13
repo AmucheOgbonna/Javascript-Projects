@@ -1,0 +1,12 @@
+USERS
+-----Login
+-Deposit Money
+-Wihdraw
+-TransferFunds to other Users
+-See a list of their transaction
+
+ADMIN
+-Add Users
+-Delete Users
+-Reverse Transaction
+-Disable a Users Account
