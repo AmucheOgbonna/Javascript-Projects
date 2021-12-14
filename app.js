@@ -1,100 +1,32 @@
-const express = require('express');
+//node module imports
+const express = require("express");
+const morgan = require("morgan");
+const mongoose = require("mongoose");
+require("dotenv").config();
+
+//route imports 
+const authRoutes = require('./routes/auth.routes')
+
+//init app
 const app = express();
-const morgan= require('morgan');
-require('dotenv').config();
 
-// SETTING UP DATABASE
-const mongoose = require('mongoose');
-const MONGODB_URI= process.env.MONGODB_URI
-
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
-
-const port = process.env.PORT;
-
-app.use(morgan('dev'));
-app.use(express.json());
-app.use(express.urlencoded({extended:false}))
-
-const User=require('./models/user')
+//middlewares
+app.use(express.json()); //post request data
+app.use(express.urlencoded({ extended: true }));
 
 
-app.get('/ping', (req,res)=>{
-    res.status(200).send('Hello World!');
-})
-// User
+//routes
+app.use('/api/auth', authRoutes)
 
-app.post('/auth/signup', async (req,res)=>{
-    const data = req.body;
-    try {
-        const passwordHash = await bcrypt.hash(data.password, 10);
-        const user = await new User({
-            fullname:data.fullname,
-            email:data.email,
-            bvn:data.bvn,
-            accountno:data.accountno,
-            password:passwordHash
-        }).save();
-        const token = jwt.sign({user_id:user._id}, JWT_SECRET_KEY, {expiresIn:60*10});
+//database connection
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(() => {
+    console.log("database connection is successful");
+  })
+  .catch((err) => console.log("Error: ", err));
 
-        res.status(201).send({
-            message:"User Created",
-            data:{
-            fullname:user.fullname,
-            email:user.email,
-            accountno:user.accountno,
-            token,
-            user_id:user._id
-            }
-        })
-    } catch (error) {
-        res.status(400).send({
-            message:"User couldn't be created", error:error.message
-        })
-    }
-})
-
-app.post('/auth/signin', async (req,res)=>{
-    const data = req.body;
-    try {
-        const user = await User.findOne({
-            email:data.email
-        })
-        if(!user){
-            return res.status(400).send({message:"User does not exist"})
-        }
-        const isValidPassword = await bcrypt.compare(data.password, user.password);
-        if(!isValidPassword){
-            return res.status(400).send({
-                message:"Invalid email or password"
-            })
-        }
-        const token = jwt.sign({user_id:user._id}, JWT_SECRET_KEY);
-        res.status(201).send({
-            message:"Login Successful",
-            data:{
-                token, email:user.email,fullname:user.fullname, user_id:user._id
-            }
-        })
-
-    } catch (error) {
-        res.status(400).send({
-            message:"Login failed  XXXX", error:error.message
-        })
-    }
-})
-
-app.patch('')
-
-
-app.listen(port, async ()=>{
-    try{
-        await mongoose.connect(MONGODB_URI);
-        console.log('Connected to MongoDB DB');
-    }catch(error){
-        console.log("Couldn't connect to DB");
-    }
-
-    console.log(`:::> Lisening on http://localhost:${port}`);
-})
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`app is running on port ${PORT}`);
+});

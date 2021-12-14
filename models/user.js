@@ -1,41 +1,45 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const mongoose = require('mongoose')
+const bcrypt = require('bcrypt')
 
-const UserSchema = new Schema({
-    fullname:{
-        required:true,
-        type:String
+
+const UserSchema = new mongoose.Schema({
+    firstname: {
+        type: String,
+        required: [true, 'firstname is required']
     },
-    email:{
-        required:true,
-        unique:true,
-        type:String
+    lastname:{
+        type: String,
+        required: [true, 'lastname is required']
     },
-    bvn:{
-        required:true,
-        unique:true,
-        type:Number,
-        // minlength:12,
-        // maxlength:12
+    email: {
+        type: String,
+        required: [true, 'email is required'],
+        unique: true
     },
-    accountno:{
-        required:true,
-        type:Number,
-        unique:true,
-        // minlength:10,
-        // maxlength:10
-    },
-    disable:{
-        default:false,
+    roles: {
+        type: String,
+        enum: ['admin', 'user'],
+        default: 'user'
     },
     password:{
         type: String,
-        required:true
-    },
-    amount:{
-        type:Number,
-        default:0
+        required: [true, 'password is required'],
+        min: 6,
+        max: 20
     }
+}, {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
 })
 
-module.exports=mongoose.model('user',UserSchema);
+
+UserSchema.pre('save', async function(next){
+    this.password = await bcrypt.hash(this.password, 10);
+    return next();
+})
+
+
+const User = mongoose.model('User', UserSchema);
+
+module.exports = User
