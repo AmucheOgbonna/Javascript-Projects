@@ -88,3 +88,15 @@ app.post('/user/deposit', auth(),async (req,res)=>{
 
     
 })
+
+
+db.getCollection('noti').findOneAndUpdate(
+  { _id: ObjectId("5bc061f05a4c0511a9252e88") }, 
+  { $push: { 
+            graph: {
+              "date" : ISODate("2018-10-24T08:55:13.331Z"),
+              "count" : 10.0
+              }  
+          },
+     $inc: { count: 1 } 
+  }, {new: true })
