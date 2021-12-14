@@ -6,6 +6,7 @@ require("dotenv").config();
 
 //route imports 
 const authRoutes = require('./routes/auth.routes')
+const userRoutes = require('./routes/user.routes')
 
 //init app
 const app = express();
@@ -17,6 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 
 //routes
 app.use('/api/auth', authRoutes)
+app.use('/api/user', userRoutes)
 
 //database connection
 mongoose
