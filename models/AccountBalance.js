@@ -1,19 +1,17 @@
 const mongoose = require('mongoose');
 
-const AccountSchema = new mongoose.Schema(
+const AccountBalanceSchema = new mongoose.Schema(
   {
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-    },
     accountNumber: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Account',
+    },
+    amount: {
       type: Number,
       required: true,
-      unique: true,
     },
-    accountName: {
-      type: String,
-      required: true,
+    balance: {
+      type: Number,
     },
   },
   {
@@ -22,4 +20,4 @@ const AccountSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   },
 );
-module.exports = mongoose.model('Account', AccountSchema);
+module.exports = mongoose.model('AccountBalance', AccountBalanceSchema);

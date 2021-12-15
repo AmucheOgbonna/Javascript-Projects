@@ -1,9 +1,8 @@
 const router = require('express').Router();
 
-//file imports 
-const {protectedRoutes,myProfile } = require('../controllers/authController')
+//file imports
+const { protectedRoutes, myProfile } = require('../controllers/authController');
 
-router.use(protectedRoutes)
-router.get('/profile',  myProfile)
+router.get('/profile', myProfile);
 
-module.exports = router
+module.exports = router;
